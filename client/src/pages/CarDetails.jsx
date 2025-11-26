@@ -29,7 +29,11 @@ const CarDetails = () => {
             const reviewsData = await getCarReviews(id);
             setReviews(reviewsData);
         } catch (error) {
-            toast.error('Failed to fetch car details');
+            console.error('Error fetching car:', error);
+            // Only show error if car is actually not found
+            if (error.response?.status === 404) {
+                toast.error('Car not found');
+            }
         } finally {
             setLoading(false);
         }

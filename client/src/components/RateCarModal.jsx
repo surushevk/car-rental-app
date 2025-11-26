@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { createReview } from '../services/reviewService';
+import { AuthContext } from '../context/AuthContext';
 
 const RateCarModal = ({ isOpen, onClose, booking, onReviewSubmitted }) => {
+    const { token } = useContext(AuthContext);
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(0);
     const [comment, setComment] = useState('');
@@ -28,7 +30,7 @@ const RateCarModal = ({ isOpen, onClose, booking, onReviewSubmitted }) => {
                 bookingId: booking._id,
                 rating,
                 comment,
-            });
+            }, token);
             toast.success('Review submitted successfully');
             onReviewSubmitted();
             onClose();

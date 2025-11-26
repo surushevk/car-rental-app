@@ -13,27 +13,23 @@ const BookingPage = () => {
     const { selectedCar, searchParams, setBookingDetails } = useContext(BookingContext);
     const navigate = useNavigate();
 
-    // Initialize dates with default times (e.g., 9 AM)
-    // Initialize dates with default times (e.g., 9 AM)
+    // Initialize dates - only pre-fill if user searched with dates
     const [pickupDate, setPickupDate] = useState(() => {
-        if (searchParams.pickupDate) {
+        // Only use searchParams if they exist and are valid
+        if (searchParams.pickupDate && searchParams.pickupDate !== '') {
             return new Date(searchParams.pickupDate);
         }
-        const date = new Date();
-        date.setHours(9, 0, 0, 0);
-        // If current time is past 9 AM, set to next hour or tomorrow
-        if (date < new Date()) {
-            date.setTime(Date.now() + 3600000); // +1 hour
-        }
-        return date;
+        // Otherwise, leave empty (null) for user to select
+        return null;
     });
+
     const [dropDate, setDropDate] = useState(() => {
-        if (searchParams.dropDate) {
+        // Only use searchParams if they exist and are valid
+        if (searchParams.dropDate && searchParams.dropDate !== '') {
             return new Date(searchParams.dropDate);
         }
-        const date = new Date(Date.now() + 86400000);
-        date.setHours(9, 0, 0, 0);
-        return date;
+        // Otherwise, leave empty (null) for user to select
+        return null;
     });
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [loading, setLoading] = useState(false);
@@ -160,12 +156,67 @@ const BookingPage = () => {
                                     </label>
                                     <DatePicker
                                         selected={pickupDate}
-                                        onChange={(date) => setPickupDate(date)}
+                                        onChange={(date) => {
+                                            if (!date) {
+                                                setPickupDate(null);
+                                                setDropDate(null);
+                                                return;
+                                            }
+
+                                            const newDate = new Date(date);
+                                            const now = new Date();
+                                            const isToday = newDate.toDateString() === now.toDateString();
+
+                                            // Check if time needs to be adjusted (default 00:00 or past time)
+                                            const isDefaultTime = newDate.getHours() === 0 && newDate.getMinutes() === 0;
+                                            const isPastTime = isToday && newDate < now;
+
+                                            if (isDefaultTime || isPastTime) {
+                                                if (isToday) {
+                                                    // Round to next 30 min
+                                                    let hours = now.getHours();
+                                                    let minutes = now.getMinutes();
+
+                                                    if (minutes < 30) {
+                                                        minutes = 30;
+                                                    } else {
+                                                        minutes = 0;
+                                                        hours += 1;
+                                                    }
+
+                                                    // Enforce min 7 AM
+                                                    if (hours < 7) {
+                                                        hours = 7;
+                                                        minutes = 0;
+                                                    }
+
+                                                    // If after 10 PM, set to tomorrow 7 AM
+                                                    if (hours >= 22) {
+                                                        newDate.setDate(newDate.getDate() + 1);
+                                                        hours = 7;
+                                                        minutes = 0;
+                                                    }
+
+                                                    newDate.setHours(hours, minutes, 0, 0);
+                                                } else {
+                                                    // Future date: default to 7 AM
+                                                    newDate.setHours(7, 0, 0, 0);
+                                                }
+                                            }
+
+                                            setPickupDate(newDate);
+
+                                            // Auto-adjust drop date
+                                            if (dropDate && newDate >= dropDate) {
+                                                setDropDate(null);
+                                            }
+                                        }}
                                         minDate={new Date()}
                                         showTimeSelect
                                         minTime={new Date().setHours(7, 0, 0, 0)}
                                         maxTime={new Date().setHours(22, 0, 0, 0)}
                                         dateFormat="dd/MM/yyyy h:mm aa"
+                                        placeholderText="Select pickup date & time"
                                         className="input-field"
                                     />
                                 </div>
@@ -177,17 +228,48 @@ const BookingPage = () => {
                                     </label>
                                     <DatePicker
                                         selected={dropDate}
-                                        onChange={(date) => setDropDate(date)}
-                                        minDate={pickupDate}
+                                        onChange={(date) => {
+                                            if (!date || !pickupDate) {
+                                                setDropDate(null);
+                                                return;
+                                            }
+
+                                            const newDate = new Date(date);
+                                            const isDefaultTime = newDate.getHours() === 0 && newDate.getMinutes() === 0;
+
+                                            if (isDefaultTime) {
+                                                const isSameDay = newDate.toDateString() === pickupDate.toDateString();
+
+                                                if (isSameDay) {
+                                                    // Same day: Set to pickup time + 1 hour
+                                                    newDate.setHours(pickupDate.getHours() + 1);
+                                                    newDate.setMinutes(pickupDate.getMinutes());
+
+                                                    // If this goes past 10 PM, set to next day 7 AM
+                                                    if (newDate.getHours() >= 22) {
+                                                        newDate.setDate(newDate.getDate() + 1);
+                                                        newDate.setHours(7, 0, 0, 0);
+                                                    }
+                                                } else {
+                                                    // Different day: Set to 7 AM
+                                                    newDate.setHours(7, 0, 0, 0);
+                                                }
+                                            }
+
+                                            setDropDate(newDate);
+                                        }}
+                                        minDate={pickupDate || new Date()}
                                         showTimeSelect
                                         minTime={
-                                            dropDate.getDate() === pickupDate.getDate()
-                                                ? pickupDate // If same day, min time is pickup time
-                                                : new Date().setHours(7, 0, 0, 0) // Else 7 AM
+                                            pickupDate && dropDate && dropDate.toDateString() === pickupDate.toDateString()
+                                                ? new Date(pickupDate.getTime() + 60 * 60000) // Pickup + 1 hour
+                                                : new Date().setHours(7, 0, 0, 0) // 7 AM
                                         }
                                         maxTime={new Date().setHours(22, 0, 0, 0)}
                                         dateFormat="dd/MM/yyyy h:mm aa"
+                                        placeholderText="Select drop date & time"
                                         className="input-field"
+                                        disabled={!pickupDate}
                                     />
                                 </div>
                             </div>
