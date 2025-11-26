@@ -59,6 +59,7 @@ export const login = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 role: user.role,
+                isAdmin: user.role === 'admin',
                 isSuperAdmin: user.isSuperAdmin || false,
                 token: generateToken(user._id),
             });
@@ -83,6 +84,7 @@ export const getMe = async (req, res) => {
             email: user.email,
             phone: user.phone,
             role: user.role,
+            isAdmin: user.role === 'admin',
             isSuperAdmin: user.isSuperAdmin || false,
         });
     } catch (error) {
