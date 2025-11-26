@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchCars } from '../services/carService';
 import { BookingContext } from '../context/BookingContext';
+import SearchBar from '../components/SearchBar';
 import CarCard from '../components/CarCard';
 import { FaFilter, FaSort } from 'react-icons/fa';
 import { toast } from 'react-toastify';
@@ -62,7 +63,12 @@ const CarSearch = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="container-custom">
-                <h1 className="text-3xl font-bold mb-8">Available Cars</h1>
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8">
+                    <h1 className="text-3xl font-bold text-gray-800">Available Cars</h1>
+                    <div className="flex-1 w-full">
+                        <SearchBar compact={true} />
+                    </div>
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     {/* Filters Sidebar */}

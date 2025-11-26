@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { searchCars, createCar, updateCar, deleteCar } from '../services/carService';
+import { getCities } from '../services/cityService';
 import AdminSidebar from '../components/AdminSidebar';
 import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
@@ -25,10 +26,21 @@ const AdminCars = () => {
         year: new Date().getFullYear(),
     });
     const [images, setImages] = useState([]);
+    const [cities, setCities] = useState([]);
 
     useEffect(() => {
         fetchCars();
+        fetchCities();
     }, []);
+
+    const fetchCities = async () => {
+        try {
+            const data = await getCities();
+            setCities(data);
+        } catch (error) {
+            console.error('Error fetching cities:', error);
+        }
+    };
 
     const fetchCars = async () => {
         try {
@@ -273,14 +285,19 @@ const AdminCars = () => {
                                         required
                                         className="input-field"
                                     />
-                                    <input
-                                        type="text"
-                                        placeholder="City"
+                                    <select
                                         value={formData.city}
                                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                                         required
                                         className="input-field"
-                                    />
+                                    >
+                                        <option value="">Select City</option>
+                                        {cities.map((city) => (
+                                            <option key={city._id} value={city.name}>
+                                                {city.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                     <select
                                         value={formData.transmission}
                                         onChange={(e) => setFormData({ ...formData, transmission: e.target.value })}

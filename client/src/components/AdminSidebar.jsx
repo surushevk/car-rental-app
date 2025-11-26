@@ -8,6 +8,7 @@ import {
     FaUserShield,
     FaSignOutAlt,
     FaTicketAlt,
+    FaMapMarkerAlt,
 } from 'react-icons/fa';
 
 const AdminSidebar = ({ activePage }) => {
@@ -17,6 +18,7 @@ const AdminSidebar = ({ activePage }) => {
         { name: 'Dashboard', path: '/admin/dashboard', icon: FaTachometerAlt },
         { name: 'Cars', path: '/admin/cars', icon: FaCar },
         { name: 'Bookings', path: '/admin/bookings', icon: FaCalendar },
+        { name: 'Cities', path: '/admin/cities', icon: FaMapMarkerAlt },
         { name: 'Coupons', path: '/admin/coupons', icon: FaTicketAlt },
     ];
 

@@ -14,8 +14,12 @@ const BookingPage = () => {
     const navigate = useNavigate();
 
     // Initialize dates with default times (e.g., 9 AM)
+    // Initialize dates with default times (e.g., 9 AM)
     const [pickupDate, setPickupDate] = useState(() => {
-        const date = searchParams.pickupDate ? new Date(searchParams.pickupDate) : new Date();
+        if (searchParams.pickupDate) {
+            return new Date(searchParams.pickupDate);
+        }
+        const date = new Date();
         date.setHours(9, 0, 0, 0);
         // If current time is past 9 AM, set to next hour or tomorrow
         if (date < new Date()) {
@@ -24,7 +28,10 @@ const BookingPage = () => {
         return date;
     });
     const [dropDate, setDropDate] = useState(() => {
-        const date = searchParams.dropDate ? new Date(searchParams.dropDate) : new Date(Date.now() + 86400000);
+        if (searchParams.dropDate) {
+            return new Date(searchParams.dropDate);
+        }
+        const date = new Date(Date.now() + 86400000);
         date.setHours(9, 0, 0, 0);
         return date;
     });

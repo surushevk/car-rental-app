@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
+import CitiesSection from '../components/CitiesSection';
 import { FaCheckCircle, FaCar, FaShieldAlt, FaHeadset } from 'react-icons/fa';
 
 const Home = () => {
@@ -44,6 +45,9 @@ const Home = () => {
                     <SearchBar />
                 </div>
             </section>
+
+            {/* Cities Section */}
+            <CitiesSection />
 
             {/* Features Section */}
             <section className="py-16 bg-white">

@@ -113,12 +113,6 @@ const Login = () => {
                         </p>
                     </div>
 
-                    {/* Demo Credentials */}
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                        <p className="text-sm font-semibold text-blue-900 mb-2">Demo Credentials:</p>
-                        <p className="text-sm text-blue-800">Admin: admin@carrental.com / admin123</p>
-                        <p className="text-sm text-blue-800">User: john@example.com / password123</p>
-                    </div>
                 </div>
             </div>
         </div>

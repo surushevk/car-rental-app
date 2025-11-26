@@ -28,6 +28,7 @@ import AdminCars from './pages/AdminCars';
 import AdminBookings from './pages/AdminBookings';
 import AdminUsers from './pages/AdminUsers';
 import AdminCoupons from './pages/AdminCoupons';
+import ManageCities from './pages/ManageCities';
 
 function App() {
     return (
@@ -111,6 +112,14 @@ function App() {
                                     element={
                                         <ProtectedRoute adminOnly>
                                             <AdminUsers />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin/cities"
+                                    element={
+                                        <ProtectedRoute adminOnly>
+                                            <ManageCities />
                                         </ProtectedRoute>
                                     }
                                 />
