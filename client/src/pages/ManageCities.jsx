@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaTimes, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 
 const ManageCities = () => {
-    const { user } = useContext(AuthContext);
+    const { user, token } = useContext(AuthContext);
     const [cities, setCities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -23,7 +23,7 @@ const ManageCities = () => {
 
     const fetchCities = async () => {
         try {
-            const data = await getAllCities(user.token);
+            const data = await getAllCities(token);
             setCities(data);
         } catch (error) {
             toast.error('Failed to fetch cities');
@@ -37,10 +37,10 @@ const ManageCities = () => {
 
         try {
             if (editingCity) {
-                await updateCity(editingCity._id, formData, user.token);
+                await updateCity(editingCity._id, formData, token);
                 toast.success('City updated successfully');
             } else {
-                await addCity(formData, user.token);
+                await addCity(formData, token);
                 toast.success('City added successfully');
             }
 
@@ -64,7 +64,7 @@ const ManageCities = () => {
 
     const handleToggleActive = async (city) => {
         try {
-            await updateCity(city._id, { isActive: !city.isActive }, user.token);
+            await updateCity(city._id, { isActive: !city.isActive }, token);
             toast.success(`City ${city.isActive ? 'deactivated' : 'activated'} successfully`);
             fetchCities();
         } catch (error) {
@@ -75,7 +75,7 @@ const ManageCities = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this city?')) {
             try {
-                await deleteCity(id, user.token);
+                await deleteCity(id, token);
                 toast.success('City deleted successfully');
                 fetchCities();
             } catch (error) {
@@ -161,8 +161,8 @@ const ManageCities = () => {
                                             <button
                                                 onClick={() => handleToggleActive(city)}
                                                 className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${city.isActive
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-red-100 text-red-800'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
                                                     }`}
                                             >
                                                 {city.isActive ? (
