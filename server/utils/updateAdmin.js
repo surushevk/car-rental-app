@@ -30,6 +30,7 @@ const updateAdminCredentials = async () => {
             email: adminEmail,
             password: adminPassword,
             phone: '9359000000', // You can change this
+            role: 'admin',
             isAdmin: true,
             isSuperAdmin: true, // Making super admin for full access
         });
