@@ -100,6 +100,20 @@ const BookingPage = () => {
             return;
         }
 
+        // Validate operating hours (7 AM - 10 PM)
+        const pickupHour = pickupDate.getHours();
+        const dropHour = dropDate.getHours();
+
+        if (pickupHour < 7 || pickupHour > 22) {
+            toast.error('Pickup time must be between 7 AM and 10 PM');
+            return;
+        }
+
+        if (dropHour < 7 || dropHour > 22) {
+            toast.error('Drop time must be between 7 AM and 10 PM');
+            return;
+        }
+
         // Prepare booking details
         const bookingData = {
             carId: selectedCar._id,

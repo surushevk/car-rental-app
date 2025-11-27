@@ -30,11 +30,14 @@ import AdminUsers from './pages/AdminUsers';
 import AdminCoupons from './pages/AdminCoupons';
 import ManageCities from './pages/ManageCities';
 
+import ScrollToTop from './components/ScrollToTop';
+
 function App() {
     return (
         <AuthProvider>
             <BookingProvider>
                 <Router>
+                    <ScrollToTop />
                     <div className="flex flex-col min-h-screen">
                         <Navbar />
                         <main className="flex-grow">

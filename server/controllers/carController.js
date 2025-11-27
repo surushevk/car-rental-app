@@ -47,20 +47,37 @@ export const getCars = async (req, res) => {
 
         let cars = await carsQuery;
 
-        // Filter by availability if dates provided
-        if (pickupDate && dropDate) {
+        // Filter by availability if pickupDate is provided
+        if (pickupDate) {
             const pickup = new Date(pickupDate);
-            const drop = new Date(dropDate);
+            // If dropDate is provided, use it; otherwise check availability for the pickup time itself
+            const drop = dropDate ? new Date(dropDate) : new Date(pickupDate);
 
             // Get all bookings that overlap with requested dates
+            // Get all bookings that overlap with requested dates
+            // A booking overlaps if it is confirmed OR (pending AND created within last 10 mins)
+            const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+
             const overlappingBookings = await Booking.find({
-                status: { $in: ['pending', 'confirmed'] },
-                $or: [
+                $and: [
                     {
-                        pickupDate: { $lte: drop },
-                        dropDate: { $gte: pickup },
+                        $or: [
+                            { status: 'confirmed' },
+                            {
+                                status: 'pending',
+                                createdAt: { $gt: tenMinutesAgo }
+                            }
+                        ]
                     },
-                ],
+                    {
+                        $or: [
+                            {
+                                pickupDate: { $lte: drop },
+                                dropDate: { $gte: pickup },
+                            },
+                        ]
+                    }
+                ]
             }).select('car');
 
             const bookedCarIds = overlappingBookings.map((b) => b.car.toString());

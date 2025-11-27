@@ -4,13 +4,14 @@ import { searchCars } from '../services/carService';
 import { BookingContext } from '../context/BookingContext';
 import SearchBar from '../components/SearchBar';
 import CarCard from '../components/CarCard';
-import { FaFilter, FaSort } from 'react-icons/fa';
+import { FaFilter, FaSort, FaChevronDown } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 const CarSearch = () => {
     const { searchParams } = useContext(BookingContext);
     const [cars, setCars] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({
         minPrice: '',
         maxPrice: '',
@@ -48,6 +49,10 @@ const CarSearch = () => {
 
     const applyFilters = () => {
         fetchCars();
+        // Optional: Close filters on mobile after applying
+        if (window.innerWidth < 1024) {
+            setShowFilters(false);
+        }
     };
 
     const clearFilters = () => {
@@ -74,20 +79,31 @@ const CarSearch = () => {
                     {/* Filters Sidebar */}
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-xl shadow-md p-6 sticky top-24">
-                            <div className="flex items-center justify-between mb-6">
+                            <div
+                                className="flex items-center justify-between mb-0 lg:mb-6 cursor-pointer lg:cursor-default"
+                                onClick={() => setShowFilters(!showFilters)}
+                            >
                                 <h2 className="text-xl font-bold flex items-center">
                                     <FaFilter className="mr-2 text-primary-600" />
                                     Filters
                                 </h2>
-                                <button
-                                    onClick={clearFilters}
-                                    className="text-sm text-primary-600 hover:underline"
-                                >
-                                    Clear
-                                </button>
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            clearFilters();
+                                        }}
+                                        className="text-sm text-primary-600 hover:underline"
+                                    >
+                                        Clear
+                                    </button>
+                                    <FaChevronDown
+                                        className={`lg:hidden transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`}
+                                    />
+                                </div>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className={`${showFilters ? 'block' : 'hidden'} lg:block mt-6 lg:mt-0 space-y-4`}>
                                 {/* Price Range */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">

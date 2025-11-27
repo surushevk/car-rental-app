@@ -60,8 +60,15 @@ app.get('/api/health', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
+import { cleanupStaleBookings } from './services/cleanupService.js';
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+
+    // Run cleanup every 1 minute
+    setInterval(cleanupStaleBookings, 60 * 1000);
+    // Run once on startup
+    cleanupStaleBookings();
 });

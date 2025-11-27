@@ -24,9 +24,15 @@ export const createBooking = async (req, res) => {
             return res.status(400).json({ message: 'Drop date must be after pickup date' });
         }
 
-        // Validate operating hours (7 AM - 10 PM)
-        const pickupHour = pickup.getHours();
-        const dropHour = drop.getHours();
+        // Validate operating hours (7 AM - 10 PM) in IST
+        const getISTHour = (date) => {
+            const options = { timeZone: 'Asia/Kolkata', hour: 'numeric', hour12: false };
+            const formatter = new Intl.DateTimeFormat('en-US', options);
+            return parseInt(formatter.format(date));
+        };
+
+        const pickupHour = getISTHour(pickup);
+        const dropHour = getISTHour(drop);
 
         if (pickupHour < 7 || pickupHour > 22) {
             return res.status(400).json({ message: 'Pickup time must be between 7 AM and 10 PM' });
@@ -43,15 +49,31 @@ export const createBooking = async (req, res) => {
         }
 
         // Check availability - look for overlapping bookings
+        // Check availability - look for overlapping bookings
+        // A booking overlaps if it is confirmed OR (pending AND created within last 10 mins)
+        const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+
         const overlappingBooking = await Booking.findOne({
             car: carId,
-            status: { $in: ['pending', 'confirmed'] },
-            $or: [
+            $and: [
                 {
-                    pickupDate: { $lte: drop },
-                    dropDate: { $gte: pickup },
+                    $or: [
+                        { status: 'confirmed' },
+                        {
+                            status: 'pending',
+                            createdAt: { $gt: tenMinutesAgo }
+                        }
+                    ]
                 },
-            ],
+                {
+                    $or: [
+                        {
+                            pickupDate: { $lte: drop },
+                            dropDate: { $gte: pickup },
+                        },
+                    ]
+                }
+            ]
         });
 
         if (overlappingBooking) {
